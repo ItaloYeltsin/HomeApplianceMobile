@@ -54,7 +54,7 @@ public class HomeApplianceMobile extends MainWindow {
     private Button btnMinus;
     private Button btnPlus;
 
-    private ImageControl background;
+    private ImageControl backgroundDay, backgroundNight;
 
     private Label lblTemp;
 
@@ -72,17 +72,26 @@ public class HomeApplianceMobile extends MainWindow {
     }
 
     public HomeApplianceMobile() {
-        setUIStyle(Settings.MATERIAL_UI);
+        setUIStyle(Settings.FLAT_UI);
     }
 
     @Override
     public void initUI() {
 
         try {
-            Image imgBackground = new Image(B_DAY).hwScaledFixedAspectRatio((int) (getHeight() * 1.2), true);
-            background = new ImageControl(imgBackground);
-            background.centerImage = true;
-            add(background, LEFT, TOP, FILL, FILL);
+
+            Image imgBackground = new Image(B_NIGHT).hwScaledFixedAspectRatio((int) (getHeight() * 1.2), true);
+            backgroundNight = new ImageControl(imgBackground);
+            backgroundNight.centerImage = true;
+            backgroundNight.transparentBackground = true;
+            add(backgroundNight, LEFT, TOP, FILL, FILL);
+
+            imgBackground = new Image(B_DAY).hwScaledFixedAspectRatio((int) (getHeight() * 1.2), true);
+            backgroundDay = new ImageControl(imgBackground);
+            backgroundDay.centerImage = true;
+            backgroundDay.transparentBackground = true;
+
+            add(backgroundDay, LEFT, TOP, FILL, FILL);
         } catch (IOException | ImageException e) {
             e.printStackTrace();
         }
@@ -217,13 +226,21 @@ public class HomeApplianceMobile extends MainWindow {
             transmit();
 
             if (on) {
-                background.setImage(new Image(B_DAY).hwScaledFixedAspectRatio((int) (getHeight() * 1.2), true));
+                // background.setImage(new Image(B_DAY).hwScaledFixedAspectRatio((int)
+                // (getHeight() * 1.2), true));
+
                 btnOff.setImage(new Image(OFF_DAY).hwScaledFixedAspectRatio(fmH * 6, true));
                 btnOn.setImage(new Image(ON_DAY).hwScaledFixedAspectRatio(fmH * 6, true));
+
+                toggleImage(backgroundDay, backgroundNight);
             } else {
-                background.setImage(new Image(B_NIGHT).hwScaledFixedAspectRatio((int) (getHeight() * 1.2), true));
+                // background.setImage(new Image(B_NIGHT).hwScaledFixedAspectRatio((int)
+                // (getHeight() * 1.2), true));
+
                 btnOff.setImage(new Image(OFF_NIGHT).hwScaledFixedAspectRatio(fmH * 6, true));
                 btnOn.setImage(new Image(ON_NIGHT).hwScaledFixedAspectRatio(fmH * 6, true));
+
+                toggleImage(backgroundNight, backgroundDay);
             }
 
         } catch (Exception e) {
@@ -277,32 +294,51 @@ public class HomeApplianceMobile extends MainWindow {
      * @throws UnsupportedEncodingException
      */
     private void transmit() throws Exception {
-        Map<String, Object> command = new HashMap<String, Object>();
-        command.put("power", power);
-        command.put("temp", temp);
-        command.put("timestamp", new Time().getSQLLong());
 
-        JSONObject json = new JSONObject(command);
-        System.out.println(json.toString());
+        new Thread() {
+            public void run() {
 
-        final HttpStream.Options options = new HttpStream.Options();
-        options.readTimeOut = 15000;
-        options.socketFactory = new SSLSocketFactory();
-        options.writeTimeOut = 15000;
-        options.openTimeOut = 5000;
-        options.httpType = HttpStream.POST;
-        options.writeBytesSize = 4096;
-        options.setContentType("application/json; charset=UTF-8");
-        options.setCharsetEncoding("UTF-8");
+                Map<String, Object> command = new HashMap<String, Object>();
+                command.put("power", power);
+                command.put("temp", temp);
+                command.put("timestamp", new Time().getSQLLong());
 
-        options.data = json.toString();
+                JSONObject json = new JSONObject(command);
+                System.out.println(json.toString());
 
-        URI uri = new URI(FIREBASE_URL);
-        Vm.debug(uri.toString());
-        try (final HttpStream hs = new HttpStream(uri, options)) {
-            if (!hs.isOk()) {
-                throw new Exception("Connection Error!");
+                final HttpStream.Options options = new HttpStream.Options();
+                options.readTimeOut = 15000;
+                options.socketFactory = new SSLSocketFactory();
+                options.writeTimeOut = 15000;
+                options.openTimeOut = 5000;
+                options.httpType = HttpStream.POST;
+                options.writeBytesSize = 4096;
+                options.setContentType("application/json; charset=UTF-8");
+                options.setCharsetEncoding("UTF-8");
+
+                options.data = json.toString();
+
+                URI uri = new URI(FIREBASE_URL);
+                Vm.debug(uri.toString());
+                try (final HttpStream hs = new HttpStream(uri, options)) {
+                    if (!hs.isOk()) {
+                        throw new Exception("Connection Error!");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
+
+        }.start();
+    }
+
+    private void toggleImage(ImageControl day, ImageControl night) {
+        for (int i = 0; i < 255; i += 25) {
+            day.getImage().alphaMask = Math.min(i, 255);
+            night.getImage().alphaMask = Math.max(0, 255 - i);
+            day.repaintNow();
+            night.repaintNow();
         }
     }
 
