@@ -144,7 +144,7 @@ public class HomeApplianceMobile extends MainWindow {
 
         int color = 0x848484;
 
-        lblTemp = new Label("20º");
+        lblTemp = new Label("20");
         lblTemp.align = CENTER;
         lblTemp.setForeColor(color);
         lblTemp.setFont(Font.getFont(Font.MAX_FONT_SIZE - 5));
@@ -277,7 +277,7 @@ public class HomeApplianceMobile extends MainWindow {
 
             transmit();
 
-            lblTemp.setText(temp + "º");
+            lblTemp.setText(temp + "");
 
         } catch (Exception e) {
             temp = originalTemp;
