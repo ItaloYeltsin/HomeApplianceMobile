@@ -49,7 +49,7 @@ public class HomeApplianceMobile extends MainWindow {
     final String ON_DAY = "drawable/on_day.png";
     final String ON_NIGHT = "drawable/on_night.png";
 
-    final int ONE_DP = (int)(Math.round(Settings.screenDensity));
+    final int ONE_DP = (int) (Math.round(Settings.screenDensity));
 
     private Button btnOff;
     private Button btnOn;
@@ -127,7 +127,8 @@ public class HomeApplianceMobile extends MainWindow {
         }
 
         try {
-            Image imgMinus = new Image("drawable/minus.png").hwScaledFixedAspectRatio(UnitsConverter.toPixels(DP + 60), true);
+            Image imgMinus = new Image("drawable/minus.png").hwScaledFixedAspectRatio(UnitsConverter.toPixels(DP + 60),
+                    true);
             btnMinus = new Button(imgMinus);
             btnMinus.setBorder(BORDER_NONE);
             btnMinus.transparentBackground = true;
@@ -138,7 +139,8 @@ public class HomeApplianceMobile extends MainWindow {
         }
 
         try {
-            Image imgPlus = new Image("drawable/plus.png").hwScaledFixedAspectRatio(UnitsConverter.toPixels(DP + 60), true);
+            Image imgPlus = new Image("drawable/plus.png").hwScaledFixedAspectRatio(UnitsConverter.toPixels(DP + 60),
+                    true);
             btnPlus = new Button(imgPlus);
             btnPlus.setBorder(BORDER_NONE);
             btnPlus.transparentBackground = true;
@@ -341,6 +343,8 @@ public class HomeApplianceMobile extends MainWindow {
 
     private void toggleImage(ImageControl day, ImageControl night) {
         for (int i = 0; i < 255; i += 25) {
+            if (i + 5 == 255)
+                i = 255;
             day.getImage().alphaMask = Math.min(i, 255);
             night.getImage().alphaMask = Math.max(0, 255 - i);
             day.repaintNow();
