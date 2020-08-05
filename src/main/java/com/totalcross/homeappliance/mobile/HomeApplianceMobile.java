@@ -24,6 +24,8 @@ import totalcross.ui.font.Font;
 import totalcross.ui.image.Image;
 import totalcross.ui.image.ImageException;
 import totalcross.ui.layout.HBox;
+import totalcross.util.UnitsConverter;
+import totalcross.sys.Settings;
 
 /**
  * @author @gustavopontes
@@ -47,7 +49,7 @@ public class HomeApplianceMobile extends MainWindow {
     final String ON_DAY = "drawable/on_day.png";
     final String ON_NIGHT = "drawable/on_night.png";
 
-    final int ONE_DP = (int) (fmH / 20);
+    final int ONE_DP = (int)(Math.round(Settings.screenDensity));
 
     private Button btnOff;
     private Button btnOn;
@@ -73,6 +75,7 @@ public class HomeApplianceMobile extends MainWindow {
 
     public HomeApplianceMobile() {
         setUIStyle(Settings.FLAT_UI);
+        Settings.iosCFBundleIdentifier = "com.totalcross.showcase";
     }
 
     @Override
@@ -110,18 +113,21 @@ public class HomeApplianceMobile extends MainWindow {
         ImageControl icTerm = new ImageControl();
 
         try {
-            Image imgTerm = new Image("drawable/term.png").hwScaledFixedAspectRatio((int) (getHeight() / 4), false);
-            icTerm.setImage(imgTerm);
+            Image imgTerm = new Image("drawable/term.png");
+            int width = ((int) (getHeight() / 4) * imgTerm.getWidth() / imgTerm.getHeight());
+            int height = ((int) (getHeight() / 4) * imgTerm.getHeight() / imgTerm.getWidth());
+            imgTerm = imgTerm.getSmoothScaledInstance(width, height);
             icTerm.centerImage = true;
             icTerm.transparentBackground = true;
             icTerm.scaleToFit = true;
-            add(icTerm, CENTER, CENTER, imgTerm.getWidth(), imgTerm.getHeight());
+            icTerm.setImage(imgTerm);
+            add(icTerm, CENTER, CENTER, width, height);
         } catch (IOException | ImageException e) {
             e.printStackTrace();
         }
 
         try {
-            Image imgMinus = new Image("drawable/minus.png").hwScaledFixedAspectRatio(fmH * 3, true);
+            Image imgMinus = new Image("drawable/minus.png").hwScaledFixedAspectRatio(UnitsConverter.toPixels(DP + 60), true);
             btnMinus = new Button(imgMinus);
             btnMinus.setBorder(BORDER_NONE);
             btnMinus.transparentBackground = true;
@@ -132,7 +138,7 @@ public class HomeApplianceMobile extends MainWindow {
         }
 
         try {
-            Image imgPlus = new Image("drawable/plus.png").hwScaledFixedAspectRatio(fmH * 3, true);
+            Image imgPlus = new Image("drawable/plus.png").hwScaledFixedAspectRatio(UnitsConverter.toPixels(DP + 60), true);
             btnPlus = new Button(imgPlus);
             btnPlus.setBorder(BORDER_NONE);
             btnPlus.transparentBackground = true;
@@ -162,7 +168,7 @@ public class HomeApplianceMobile extends MainWindow {
         hBox.transparentBackground = true;
 
         try {
-            Image imgOn = new Image(ON_DAY).hwScaledFixedAspectRatio(fmH * 6, true);
+            Image imgOn = new Image(ON_DAY).hwScaledFixedAspectRatio(UnitsConverter.toPixels(DP + 120), true);
             btnOn = new Button(imgOn);
             btnOn.setBorder(BORDER_NONE);
             btnOn.transparentBackground = true;
@@ -172,7 +178,7 @@ public class HomeApplianceMobile extends MainWindow {
         }
 
         try {
-            Image imgOff = new Image(OFF_DAY).hwScaledFixedAspectRatio(fmH * 6, true);
+            Image imgOff = new Image(OFF_DAY).hwScaledFixedAspectRatio(UnitsConverter.toPixels(DP + 120), true);
             btnOff = new Button(imgOff);
             btnOff.setBorder(BORDER_NONE);
             btnOff.transparentBackground = true;
@@ -229,16 +235,16 @@ public class HomeApplianceMobile extends MainWindow {
                 // background.setImage(new Image(B_DAY).hwScaledFixedAspectRatio((int)
                 // (getHeight() * 1.2), true));
 
-                btnOff.setImage(new Image(OFF_DAY).hwScaledFixedAspectRatio(fmH * 6, true));
-                btnOn.setImage(new Image(ON_DAY).hwScaledFixedAspectRatio(fmH * 6, true));
+                btnOff.setImage(new Image(OFF_DAY).hwScaledFixedAspectRatio(UnitsConverter.toPixels(DP + 120), true));
+                btnOn.setImage(new Image(ON_DAY).hwScaledFixedAspectRatio(UnitsConverter.toPixels(DP + 120), true));
 
                 toggleImage(backgroundDay, backgroundNight);
             } else {
                 // background.setImage(new Image(B_NIGHT).hwScaledFixedAspectRatio((int)
                 // (getHeight() * 1.2), true));
 
-                btnOff.setImage(new Image(OFF_NIGHT).hwScaledFixedAspectRatio(fmH * 6, true));
-                btnOn.setImage(new Image(ON_NIGHT).hwScaledFixedAspectRatio(fmH * 6, true));
+                btnOff.setImage(new Image(OFF_NIGHT).hwScaledFixedAspectRatio(UnitsConverter.toPixels(DP + 120), true));
+                btnOn.setImage(new Image(ON_NIGHT).hwScaledFixedAspectRatio(UnitsConverter.toPixels(DP + 120), true));
 
                 toggleImage(backgroundNight, backgroundDay);
             }
